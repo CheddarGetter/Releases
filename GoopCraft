@@ -1,0 +1,50 @@
+local CELL_SIZE = 2
+local BLOB_SIZE = 64
+
+
+local player = game:GetService("Players").LocalPlayer or game:GetService("Players").PlayerAdded
+local character = player.Character or player.CharacterAdded:Wait()
+
+character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(5546, 32, -17117))
+local y = character.HumanoidRootPart.Position.Y - 3
+local seed = game.PlaceId
+local update = Instance.new("BindableEvent")
+local kill   = Instance.new("BindableEvent")
+
+local function SetupCell(x, z)
+    local cell = Instance.new("Part")
+    cell.CanCollide = true
+    cell.Anchored = true
+    cell.Massless = true
+    cell.Size = Vector3.new(CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    cell.Parent = workspace
+
+    kill.Event:Connect(function()
+        cell:Destroy()
+    end)
+
+    update.Event:Connect(function(origin)
+        local x, z = origin.X + x, origin.Z + z
+
+        cell.Position = Vector3.new(x, y + math.floor(math.noise(seed, x / 50, z / 50) * 4) * CELL_SIZE, z)
+    end)
+end
+
+for x = -BLOB_SIZE / 2, BLOB_SIZE / 2, CELL_SIZE do
+    SetupCell(x, BLOB_SIZE / 2)
+
+    for z = -BLOB_SIZE / 2, BLOB_SIZE / 2, CELL_SIZE do
+        SetupCell(x, z)
+    end
+end
+
+
+while (player.Character == character) do
+    update:Fire(character.PrimaryPart.Position)
+
+    task.wait()
+end
+
+
+kill:Fire()
+kill:Destroy()
