@@ -1,64 +1,3 @@
---[[
-
-Put at the top of your script:
-
-================================================================================================================================================
-
-if (not isfile("CommandsFramework.lua")) then
-	writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
-end
-
-coroutine.wrap(function()
-	local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
-	
-	if (src ~= readfile("CommandsFramework.lua")) then
-		writefile("CommandsFramework.lua", src)
-		
-		warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
-	end
-end)()
-
-loadstring(readfile("CommandsFramework.lua"))()
-
-================================================================================================================================================
-
-Usage example:
-
-if (not isfile("CommandsFramework.lua")) then
-	writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
-end
-
-coroutine.wrap(function()
-	local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
-	
-	if (src ~= readfile("CommandsFramework.lua")) then
-		writefile("CommandsFramework.lua", src)
-		
-		warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
-	end
-end)()
-
-loadstring(readfile("CommandsFramework.lua"))()
-
-
--- Use the CommandsFramework
-Command.new({"print", "output"}, "prints stuff", function(...)
-	print(...)
-end)
-
-Command.new({"walkspeed", "ws", "speed"}, "sets your walkspeed", function(new_speed)
-	game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(new_speed) or 16
-end)
-
-game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
-	Commands:CallCommandsFromString(message)
-end)
-
-]]
-
-
-
-
 CommandPrefix    = "/"
 CommandSeperator = "; "
 
@@ -126,3 +65,4 @@ function Command:Destroy()
 
 	table.clear(self)
 end
+
