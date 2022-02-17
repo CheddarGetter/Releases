@@ -1,81 +1,86 @@
 --[[
-	Put at the top of your script:
 
-	if (not isfile("CommandsFramework.lua")) then
-		writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
-	end
-	
-	coroutine.wrap(function()
-		local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
-		
-		if (src ~= readfile("CommandsFramework.lua")) then
-			writefile("CommandsFramework.lua", src)
-			
-			warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
-		end
-	end)()
-	
-	loadstring(readfile("CommandsFramework.lua"))()
-]]
+Put at the top of your script:
 
---[[
-	Usage example:
+================================================================================================================================================
+
+if (not isfile("CommandsFramework.lua")) then
+	writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
+end
+
+coroutine.wrap(function()
+	local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
 	
-	if (not isfile("CommandsFramework.lua")) then
-		writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
-	end
-	
-	coroutine.wrap(function()
-		local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
+	if (src ~= readfile("CommandsFramework.lua")) then
+		writefile("CommandsFramework.lua", src)
 		
-		if (src ~= readfile("CommandsFramework.lua")) then
-			writefile("CommandsFramework.lua", src)
-			
-			warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
-		end
-	end)()
+		warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
+	end
+end)()
+
+loadstring(readfile("CommandsFramework.lua"))()
+
+================================================================================================================================================
+
+Usage example:
+
+if (not isfile("CommandsFramework.lua")) then
+	writefile("CommandsFramework.lua", game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua"))
+end
+
+coroutine.wrap(function()
+	local src = game:HttpGetAsync("https://raw.githubusercontent.com/CheddarGetter/Releases/main/CommandsFramework.lua")
 	
-	loadstring(readfile("CommandsFramework.lua"))()
-	
-	
-	-- Use the CommandsFramework
-	Command.new({"print", "output"}, "prints stuff", function(...)
-		print(...)
-	end)
-	
-	Command.new({"walkspeed", "ws", "speed"}, "sets your walkspeed", function(new_speed)
-		game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(new_speed)
-	end)
-	
-	game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
-		Commands:CallCommandsFromString(message)
-	end)
+	if (src ~= readfile("CommandsFramework.lua")) then
+		writefile("CommandsFramework.lua", src)
+		
+		warn("Updated CommandsFramework.lua because it was outdated, consider re-executing.")
+	end
+end)()
+
+loadstring(readfile("CommandsFramework.lua"))()
+
+
+-- Use the CommandsFramework
+Command.new({"print", "output"}, "prints stuff", function(...)
+	print(...)
+end)
+
+Command.new({"walkspeed", "ws", "speed"}, "sets your walkspeed", function(new_speed)
+	game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = tonumber(new_speed) or 16
+end)
+
+game:GetService("Players").LocalPlayer.Chatted:Connect(function(message)
+	Commands:CallCommandsFromString(message)
+end)
+
 ]]
 
 
 
 
 CommandPrefix    = "/"
-CommandSeperator = " ; "
+CommandSeperator = "; "
 
 Commands = {}
 
 function Commands:CallCommandsFromString(str)
 	for i, line in ipairs(str:split(CommandSeperator)) do
-		local split = line:split(" ")
+		local prefix = line:split(CommandPrefix)
 		
-		if (split[1]:sub(1, #CommandPrefix) ~= CommandPrefix) then
+		if (prefix[1] ~= "") then
 			return
 		end
 		
-		local found_command = Commands[split[1]:sub(#CommandPrefix + 1):lower()]
-		
-		if (found_command) then
-			table.remove(split, 1)
-			
-			found_command._called:Fire(unpack(split))
+		local args = prefix[2]:split(" ")
+		local command = Commands[args[1]:lower()]
+
+		if (command) then
+			table.remove(args, 1)
+
+			command._called:Fire(unpack(args))
 		else
-			warn(split[1]:sub(#CommandPrefix + 1) .. " is not a valid command Lol!")
+			warn(args[1] .. " is not a command")
 		end
 	end
 end
@@ -84,12 +89,12 @@ end
 Command = {}
 Command.__index = Command
 
-function Command.new(names, description, called_callback)
+function Command.new(names, description, callback)
 	local called = Instance.new("BindableEvent")
 	local destroying = Instance.new("BindableEvent")
 
-	if (called_callback) then
-		called.Event:Connect(called_callback)
+	if (callback) then
+		called.Event:Connect(callback)
 	end
 
 	local new_command = setmetatable({
